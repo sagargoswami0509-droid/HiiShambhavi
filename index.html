@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Hiiii Shambhavi</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Special Surprise 💖</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -18,31 +16,25 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 20px;
-  overflow-x: hidden;
+  padding: 15px;
 }
 
 .card {
   background: white;
-  padding: clamp(20px, 5vw, 35px);
+  padding: 20px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
   text-align: center;
-  animation: fadeIn 0.4s ease-in-out;
 }
 
-h1 {
-  font-size: clamp(20px, 5vw, 28px);
-}
-
-h2 {
-  font-size: clamp(18px, 4.5vw, 24px);
+h1, h2 {
+  font-size: 20px;
 }
 
 .question {
-  margin-bottom: 18px;
+  margin-bottom: 15px;
   text-align: left;
 }
 
@@ -56,13 +48,7 @@ button {
   padding: 10px;
   border-radius: 10px;
   border: 1px solid #ddd;
-  cursor: pointer;
-  transition: 0.3s;
-  font-size: clamp(13px, 3.5vw, 15px);
-}
-
-button:hover {
-  background: #ffe4ec;
+  font-size: 14px;
 }
 
 .selected {
@@ -74,62 +60,38 @@ button:hover {
   background: #f43f5e;
   color: white;
   border: none;
-  margin-top: 20px;
   width: 100%;
-  font-size: clamp(14px, 4vw, 16px);
+  margin-top: 15px;
 }
 
-.primary-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 #buttonArea {
   position: relative;
-  height: 200px;
+  height: 180px;
   margin-top: 20px;
   overflow: hidden;
 }
 
+#yesBtn {
+  position: relative;
+  z-index: 2;
+  width: auto;
+  padding: 10px 25px;
+}
+
 #maybeBtn {
   position: absolute;
+  z-index: 1;
   transition: 0.2s ease;
 }
 
-#celebration {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-}
-
-.particle {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  animation: burst 1.5s ease-out forwards;
-}
-
-@keyframes burst {
-  0% {
-    transform: translate(-50%, -50%) scale(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(var(--x), var(--y)) scale(1);
-    opacity: 0;
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+input[type="date"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 @media (max-width: 400px) {
@@ -141,10 +103,6 @@ button:hover {
 </head>
 <body>
 
-<audio id="applause" src="https://www.soundjay.com/human/applause-8.mp3"></audio>
-<div id="celebration"></div>
-
-<!-- STEP 1 -->
 <div id="step1" class="card">
   <h2>Before we plan our date 😌✨</h2>
 
@@ -171,23 +129,18 @@ button:hover {
   <button id="continueBtn" class="primary-btn" disabled>Continue ➜</button>
 </div>
 
-<!-- STEP 2 -->
 <div id="step2" class="card hidden">
   <h1>Will you go out with me? ❤️</h1>
   <div id="buttonArea">
-    <button id="yesBtn" class="primary-btn" style="width:auto;padding:10px 25px;position:relative;">
-      Yes 💕
-    </button>
+    <button id="yesBtn" class="primary-btn">Yes 💕</button>
     <button id="maybeBtn">Maybe 😏</button>
   </div>
 </div>
 
-<!-- STEP 3 -->
 <div id="step3" class="card hidden">
   <h2>It’s a Date! 🎉💖</h2>
   <p>Pick our special date 📅</p>
-  <input type="date" id="dateInput"
-    style="padding:10px;width:100%;margin-bottom:20px;border-radius:8px;border:1px solid #ddd;">
+  <input type="date" id="dateInput">
   <div id="summary"></div>
 </div>
 
@@ -219,8 +172,7 @@ function renderOptions(category){
 Object.keys(optionsData).forEach(renderOptions);
 
 function checkAllAnswered(){
-  const allAnswered = Object.values(answers).every(v=>v);
-  document.getElementById("continueBtn").disabled = !allAnswered;
+  continueBtn.disabled = !Object.values(answers).every(v=>v);
 }
 
 continueBtn.onclick = ()=>{
@@ -229,23 +181,16 @@ continueBtn.onclick = ()=>{
 };
 
 yesBtn.onclick = ()=>{
-  createCelebration();
-  applause.play();
-  setTimeout(()=>{
-    step2.classList.add("hidden");
-    step3.classList.remove("hidden");
-  },3000);
+  step2.classList.add("hidden");
+  step3.classList.remove("hidden");
 };
 
-/* 🔥 BOUNDED MAYBE BUTTON */
+/* ✅ MOBILE + DESKTOP SAFE MAYBE BUTTON */
 const maybeBtn = document.getElementById("maybeBtn");
 const buttonArea = document.getElementById("buttonArea");
 
-maybeBtn.addEventListener("mouseenter", moveButton);
-
 function moveButton() {
   const areaRect = buttonArea.getBoundingClientRect();
-
   const maxX = areaRect.width - maybeBtn.offsetWidth;
   const maxY = areaRect.height - maybeBtn.offsetHeight;
 
@@ -256,9 +201,13 @@ function moveButton() {
   maybeBtn.style.top = randomY + "px";
 }
 
+maybeBtn.addEventListener("mouseover", moveButton);   // desktop
+maybeBtn.addEventListener("touchstart", moveButton);  // mobile
+maybeBtn.addEventListener("click", moveButton);       // fallback
+
 dateInput.onchange = function(){
   summary.innerHTML = `
-    <div style="background:#ffe4ec;padding:15px;border-radius:12px;text-align:left;">
+    <div style="background:#ffe4ec;padding:15px;border-radius:12px;text-align:left;margin-top:10px;">
       <p><strong>Date:</strong> ${this.value} 📆</p>
       <p><strong>Vibe:</strong> ${answers.vibe}</p>
       <p><strong>Food:</strong> ${answers.food}</p>
@@ -270,23 +219,8 @@ dateInput.onchange = function(){
     </div>
   `;
 };
-
-function createCelebration(){
-  const container = document.getElementById("celebration");
-  container.innerHTML = "";
-  const colors = ["#ff4d6d","#ffbe0b","#3a86ff","#8338ec","#06d6a0"];
-  for(let i=0;i<60;i++){
-    const particle = document.createElement("div");
-    particle.className = "particle";
-    particle.style.background = colors[Math.floor(Math.random()*colors.length)];
-    const angle = Math.random()*2*Math.PI;
-    const distance = 200 + Math.random()*150;
-    particle.style.setProperty("--x", Math.cos(angle)*distance + "px");
-    particle.style.setProperty("--y", Math.sin(angle)*distance + "px");
-    container.appendChild(particle);
-  }
-}
 </script>
 
 </body>
 </html>
+
