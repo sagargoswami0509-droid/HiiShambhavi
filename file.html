@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hiiii Shambhavi</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom right, #ffe4ec, #fff1f2, #fecdd3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+.card {
+  background: white;
+  padding: clamp(20px, 5vw, 35px);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+h1 {
+  font-size: clamp(20px, 5vw, 28px);
+}
+
+h2 {
+  font-size: clamp(18px, 4.5vw, 24px);
+}
+
+.question {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+button {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: clamp(13px, 3.5vw, 15px);
+}
+
+button:hover {
+  background: #ffe4ec;
+}
+
+.selected {
+  background: #fecdd3;
+  border: 1px solid #f43f5e;
+}
+
+.primary-btn {
+  background: #f43f5e;
+  color: white;
+  border: none;
+  margin-top: 20px;
+  width: 100%;
+  font-size: clamp(14px, 4vw, 16px);
+}
+
+.primary-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.hidden {
+  display: none;
+}
+
+#buttonArea {
+  position: relative;
+  height: 200px;
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+#maybeBtn {
+  position: absolute;
+  transition: 0.2s ease;
+}
+
+#celebration {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  animation: burst 1.5s ease-out forwards;
+}
+
+@keyframes burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 400px) {
+  .options {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<audio id="applause" src="https://www.soundjay.com/human/applause-8.mp3"></audio>
+<div id="celebration"></div>
+
+<!-- STEP 1 -->
+<div id="step1" class="card">
+  <h2>Before we plan our date 😌✨</h2>
+
+  <div class="question">
+    <p>Choose the vibe ✨</p>
+    <div class="options" id="vibe"></div>
+  </div>
+
+  <div class="question">
+    <p>Favorite food 🍽️</p>
+    <div class="options" id="food"></div>
+  </div>
+
+  <div class="question">
+    <p>Fun activity 🎯</p>
+    <div class="options" id="activity"></div>
+  </div>
+
+  <div class="question">
+    <p>Best time ⏰</p>
+    <div class="options" id="time"></div>
+  </div>
+
+  <button id="continueBtn" class="primary-btn" disabled>Continue ➜</button>
+</div>
+
+<!-- STEP 2 -->
+<div id="step2" class="card hidden">
+  <h1>Will you go out with me? ❤️</h1>
+  <div id="buttonArea">
+    <button id="yesBtn" class="primary-btn" style="width:auto;padding:10px 25px;position:relative;">
+      Yes 💕
+    </button>
+    <button id="maybeBtn">Maybe 😏</button>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div id="step3" class="card hidden">
+  <h2>It’s a Date! 🎉💖</h2>
+  <p>Pick our special date 📅</p>
+  <input type="date" id="dateInput"
+    style="padding:10px;width:100%;margin-bottom:20px;border-radius:8px;border:1px solid #ddd;">
+  <div id="summary"></div>
+</div>
+
+<script>
+const answers = { vibe:"", food:"", activity:"", time:"" };
+
+const optionsData = {
+  vibe: ["Romantic 💖","Chill 🌙","Adventurous 🌍"],
+  food: ["Pizza 🍕","Biryani 🍛","Bengali Food 🐟","Chinese 🥡"],
+  activity: ["Movie 🎬","Long Drive 🚗","Bike Ride 🏍️","Shopping 🛍️"],
+  time: ["Morning 🌅","Evening 🌆","Night 🌃"]
+};
+
+function renderOptions(category){
+  const container = document.getElementById(category);
+  optionsData[category].forEach(opt=>{
+    const btn = document.createElement("button");
+    btn.innerText = opt;
+    btn.onclick = () => {
+      answers[category] = opt;
+      [...container.children].forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
+      checkAllAnswered();
+    };
+    container.appendChild(btn);
+  });
+}
+
+Object.keys(optionsData).forEach(renderOptions);
+
+function checkAllAnswered(){
+  const allAnswered = Object.values(answers).every(v=>v);
+  document.getElementById("continueBtn").disabled = !allAnswered;
+}
+
+continueBtn.onclick = ()=>{
+  step1.classList.add("hidden");
+  step2.classList.remove("hidden");
+};
+
+yesBtn.onclick = ()=>{
+  createCelebration();
+  applause.play();
+  setTimeout(()=>{
+    step2.classList.add("hidden");
+    step3.classList.remove("hidden");
+  },3000);
+};
+
+/* 🔥 BOUNDED MAYBE BUTTON */
+const maybeBtn = document.getElementById("maybeBtn");
+const buttonArea = document.getElementById("buttonArea");
+
+maybeBtn.addEventListener("mouseenter", moveButton);
+
+function moveButton() {
+  const areaRect = buttonArea.getBoundingClientRect();
+
+  const maxX = areaRect.width - maybeBtn.offsetWidth;
+  const maxY = areaRect.height - maybeBtn.offsetHeight;
+
+  const randomX = Math.random() * maxX;
+  const randomY = Math.random() * maxY;
+
+  maybeBtn.style.left = randomX + "px";
+  maybeBtn.style.top = randomY + "px";
+}
+
+dateInput.onchange = function(){
+  summary.innerHTML = `
+    <div style="background:#ffe4ec;padding:15px;border-radius:12px;text-align:left;">
+      <p><strong>Date:</strong> ${this.value} 📆</p>
+      <p><strong>Vibe:</strong> ${answers.vibe}</p>
+      <p><strong>Food:</strong> ${answers.food}</p>
+      <p><strong>Activity:</strong> ${answers.activity}</p>
+      <p><strong>Time:</strong> ${answers.time}</p>
+      <p style="text-align:center;color:#f43f5e;margin-top:10px;">
+        Take a screenshot 📸 and send it to me ❤️
+      </p>
+    </div>
+  `;
+};
+
+function createCelebration(){
+  const container = document.getElementById("celebration");
+  container.innerHTML = "";
+  const colors = ["#ff4d6d","#ffbe0b","#3a86ff","#8338ec","#06d6a0"];
+  for(let i=0;i<60;i++){
+    const particle = document.createElement("div");
+    particle.className = "particle";
+    particle.style.background = colors[Math.floor(Math.random()*colors.length)];
+    const angle = Math.random()*2*Math.PI;
+    const distance = 200 + Math.random()*150;
+    particle.style.setProperty("--x", Math.cos(angle)*distance + "px");
+    particle.style.setProperty("--y", Math.sin(angle)*distance + "px");
+    container.appendChild(particle);
+  }
+}
+</script>
+
+</body>
+</html>
