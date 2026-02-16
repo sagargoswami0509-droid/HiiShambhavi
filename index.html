@@ -17,6 +17,7 @@ body {
   align-items: center;
   min-height: 100vh;
   padding: 15px;
+  overflow-x: hidden;
 }
 
 .card {
@@ -27,16 +28,10 @@ body {
   width: 100%;
   max-width: 480px;
   text-align: center;
+  animation: fadeIn 0.4s ease-in-out;
 }
 
-h1, h2 {
-  font-size: 20px;
-}
-
-.question {
-  margin-bottom: 15px;
-  text-align: left;
-}
+.hidden { display: none; }
 
 .options {
   display: grid;
@@ -64,8 +59,6 @@ button {
   margin-top: 15px;
 }
 
-.hidden { display: none; }
-
 #buttonArea {
   position: relative;
   height: 180px;
@@ -73,16 +66,8 @@ button {
   overflow: hidden;
 }
 
-#yesBtn {
-  position: relative;
-  z-index: 2;
-  width: auto;
-  padding: 10px 25px;
-}
-
 #maybeBtn {
   position: absolute;
-  z-index: 1;
   transition: 0.2s ease;
 }
 
@@ -94,41 +79,61 @@ input[type="date"] {
   border: 1px solid #ccc;
 }
 
-@media (max-width: 400px) {
-  .options {
-    grid-template-columns: 1fr;
+/* 🎉 PARTICLE BURST */
+#celebration {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  animation: burst 1.5s ease-out forwards;
+}
+
+@keyframes burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
   }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 400px) {
+  .options { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
+<div id="celebration"></div>
+
+<!-- STEP 1 -->
 <div id="step1" class="card">
   <h2>Before we plan our date 😌✨</h2>
 
-  <div class="question">
-    <p>Choose the vibe ✨</p>
-    <div class="options" id="vibe"></div>
-  </div>
-
-  <div class="question">
-    <p>Favorite food 🍽️</p>
-    <div class="options" id="food"></div>
-  </div>
-
-  <div class="question">
-    <p>Fun activity 🎯</p>
-    <div class="options" id="activity"></div>
-  </div>
-
-  <div class="question">
-    <p>Best time ⏰</p>
-    <div class="options" id="time"></div>
-  </div>
+  <div class="options" id="vibe"></div>
+  <div class="options" id="food"></div>
+  <div class="options" id="activity"></div>
+  <div class="options" id="time"></div>
 
   <button id="continueBtn" class="primary-btn" disabled>Continue ➜</button>
 </div>
 
+<!-- STEP 2 -->
 <div id="step2" class="card hidden">
   <h1>Will you go out with me? ❤️</h1>
   <div id="buttonArea">
@@ -137,6 +142,7 @@ input[type="date"] {
   </div>
 </div>
 
+<!-- STEP 3 -->
 <div id="step3" class="card hidden">
   <h2>It’s a Date! 🎉💖</h2>
   <p>Pick our special date 📅</p>
@@ -181,11 +187,14 @@ continueBtn.onclick = ()=>{
 };
 
 yesBtn.onclick = ()=>{
-  step2.classList.add("hidden");
-  step3.classList.remove("hidden");
+  createCelebration();
+  setTimeout(()=>{
+    step2.classList.add("hidden");
+    step3.classList.remove("hidden");
+  },2000);
 };
 
-/* ✅ MOBILE + DESKTOP SAFE MAYBE BUTTON */
+/* 😏 MOBILE + DESKTOP SAFE MAYBE BUTTON */
 const maybeBtn = document.getElementById("maybeBtn");
 const buttonArea = document.getElementById("buttonArea");
 
@@ -194,33 +203,35 @@ function moveButton() {
   const maxX = areaRect.width - maybeBtn.offsetWidth;
   const maxY = areaRect.height - maybeBtn.offsetHeight;
 
-  const randomX = Math.random() * maxX;
-  const randomY = Math.random() * maxY;
-
-  maybeBtn.style.left = randomX + "px";
-  maybeBtn.style.top = randomY + "px";
+  maybeBtn.style.left = Math.random() * maxX + "px";
+  maybeBtn.style.top = Math.random() * maxY + "px";
 }
 
-maybeBtn.addEventListener("mouseover", moveButton);   // desktop
-maybeBtn.addEventListener("touchstart", moveButton);  // mobile
-maybeBtn.addEventListener("click", moveButton);       // fallback
+maybeBtn.addEventListener("mouseover", moveButton);
+maybeBtn.addEventListener("touchstart", moveButton);
+maybeBtn.addEventListener("click", moveButton);
 
-dateInput.onchange = function(){
-  summary.innerHTML = `
-    <div style="background:#ffe4ec;padding:15px;border-radius:12px;text-align:left;margin-top:10px;">
-      <p><strong>Date:</strong> ${this.value} 📆</p>
-      <p><strong>Vibe:</strong> ${answers.vibe}</p>
-      <p><strong>Food:</strong> ${answers.food}</p>
-      <p><strong>Activity:</strong> ${answers.activity}</p>
-      <p><strong>Time:</strong> ${answers.time}</p>
-      <p style="text-align:center;color:#f43f5e;margin-top:10px;">
-        Take a screenshot 📸 and send it to me ❤️
-      </p>
-    </div>
-  `;
-};
+/* 🎉 PARTICLE BURST FUNCTION */
+function createCelebration(){
+  const container = document.getElementById("celebration");
+  container.innerHTML = "";
+  const colors = ["#ff4d6d","#ffbe0b","#3a86ff","#8338ec","#06d6a0"];
+
+  for(let i=0;i<70;i++){
+    const particle = document.createElement("div");
+    particle.className = "particle";
+    particle.style.background = colors[Math.floor(Math.random()*colors.length)];
+
+    const angle = Math.random()*2*Math.PI;
+    const distance = 150 + Math.random()*150;
+
+    particle.style.setProperty("--x", Math.cos(angle)*distance + "px");
+    particle.style.setProperty("--y", Math.sin(angle)*distance + "px");
+
+    container.appendChild(particle);
+  }
+}
 </script>
 
 </body>
 </html>
-
